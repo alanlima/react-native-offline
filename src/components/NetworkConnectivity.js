@@ -81,10 +81,6 @@ class NetworkConnectivity extends React.PureComponent<Props, State> {
     const { pingInterval } = this.props;
     const handler = this.getConnectionChangeHandler();
 
-    console.log('check handler', {
-      handler
-    });
-
     NetInfo.isConnected.addEventListener('connectionChange', handler);
     // On Android the listener does not fire on startup
     if (Platform.OS === 'android') {

@@ -110,7 +110,6 @@ describe('NetworkConnectivity', () => {
             Component: MockedNetworkConnectivity,
           }),
         );
-        console.log('doing tests');
         expect(mockAddEventListener).toHaveBeenCalledTimes(1);
         expect(mockAddEventListener).toHaveBeenCalledWith(
           'connectionChange',
