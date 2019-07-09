@@ -8,6 +8,7 @@ import NetworkConnectivity, {
 } from '../src/components/NetworkConnectivity';
 import { setup, clear } from '../src/utils/checkConnectivityInterval';
 import checkInternetAccess from '../src/utils/checkInternetAccess';
+import NetInfo from '@react-native-community/netinfo';
 
 type MethodsMap = {
   [string]: Function,
@@ -109,6 +110,7 @@ describe('NetworkConnectivity', () => {
             Component: MockedNetworkConnectivity,
           }),
         );
+        console.log('doing tests');
         expect(mockAddEventListener).toHaveBeenCalledTimes(1);
         expect(mockAddEventListener).toHaveBeenCalledWith(
           'connectionChange',
