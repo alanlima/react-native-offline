@@ -3,12 +3,12 @@ import * as React from 'react';
 import { View, Platform, AppState } from 'react-native';
 import { shallow } from 'enzyme';
 import { render } from 'react-native-testing-library';
+import NetInfo from '@react-native-community/netinfo';
 import NetworkConnectivity, {
   type RequiredProps,
 } from '../src/components/NetworkConnectivity';
 import { setup, clear } from '../src/utils/checkConnectivityInterval';
 import checkInternetAccess from '../src/utils/checkInternetAccess';
-import NetInfo from '@react-native-community/netinfo';
 
 type MethodsMap = {
   [string]: Function,
@@ -16,7 +16,7 @@ type MethodsMap = {
 
 const mockAddEventListener = jest.fn();
 const mockRemoveEventListener = jest.fn();
-const mockFetch = jest.fn(() => false);
+const mockFetch = jest.fn(() => Promise.resolve(false));
 const mockConnectionChangeHandler = jest.fn();
 const mockGetConnectionChangeHandler = jest.fn(
   () => mockConnectionChangeHandler,
@@ -25,14 +25,6 @@ const mockIntervalHandler = jest.fn();
 const mockHandleNetInfoChange = jest.fn();
 const mockHandleConnectivityChange = jest.fn();
 const mockCheckInternet = jest.fn();
-
-jest.mock('NetInfo', () => ({
-  isConnected: {
-    addEventListener: mockAddEventListener,
-    removeEventListener: mockRemoveEventListener,
-    fetch: mockFetch,
-  },
-}));
 
 jest.mock('../src/utils/checkConnectivityInterval');
 jest.mock('../src/utils/checkInternetAccess', () =>
@@ -87,6 +79,26 @@ describe('NetworkConnectivity', () => {
     mockCheckInternet.mockClear();
   });
 
+  beforeAll(() => {
+    jest.restoreAllMocks();
+  });
+
+  beforeAll(() => {
+    NetInfo.isConnected = {
+      addEventListener: mockAddEventListener,
+      removeEventListener: mockRemoveEventListener,
+      fetch: mockFetch,
+    };
+  });
+
+  afterAll(() => {
+    NetInfo.isConnected = {
+      fetch: jest.fn(() => Promise.resolve(false)),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+    };
+  });
+
   it('defaultProps', () => {
     expect(NetworkConnectivity.defaultProps).toMatchSnapshot();
   });
@@ -102,6 +114,7 @@ describe('NetworkConnectivity', () => {
       it(`sets up a NetInfo.isConnected listener for connectionChange 
       AND does NOT call setupConnectivityCheckInterval`, () => {
         Platform.OS = 'ios';
+
         const MockedNetworkConnectivity = mockPrototypeMethods({
           getConnectionChangeHandler: mockGetConnectionChangeHandler,
         });
